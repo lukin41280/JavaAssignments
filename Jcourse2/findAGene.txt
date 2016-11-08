@@ -1,0 +1,51 @@
+public class findAGene {
+  
+    public String findProtein(String dna) {
+		int start = dna.indexOf("atg");
+		if (start == -1) {
+			return "no atg";
+		}
+		int tag = dna.indexOf("tag", start+3);
+		int tga = dna.indexOf("tga", start+3);
+		int taa = dna.indexOf("taa", start+3);
+		if ((tag - start) % 3 == 0) {
+			return dna.substring(start, tag+3);
+	    }
+	    else if ((tga - start) % 3 == 0) {
+			return dna.substring(start, tga+3);
+        }
+		else if ((taa - start) % 3 == 0) {
+			return dna.substring(start, taa+3);
+        }
+        else {
+			return "no protein";
+		}
+	}
+
+	public String stopCodon(String dna){
+	    String answer = findProtein(dna);
+	    int size = answer.length();
+	    if (size > 6){
+	        return answer.substring(size - 3, size);
+	    }
+	    else {
+	        return "no codon";
+	    }
+	       
+	   
+	   
+	   
+	}
+	public void realTesting() {
+		DirectoryResource dr = new DirectoryResource();
+		for (File f : dr.selectedFiles()) {
+			FileResource fr = new FileResource(f);
+			String lows = fr.asString();
+			String s = lows.toLowerCase();
+			System.out.println("read " + s.length() + " characters");
+			String result = findProtein(s);
+			System.out.println("found " + result);
+			System.out.println("codon" + stopCodon(s));
+		}
+	}
+}

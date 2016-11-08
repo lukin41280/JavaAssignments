@@ -1,0 +1,199 @@
+import edu.duke.*;
+import java.io.*;
+
+public class Assignments{
+    public int findStopIndex(String dna, int index){
+        int stop1 = dna.indexOf("tga", index);
+        if (stop1 == -1 || (stop1-index) %3 != 0){
+            stop1 = dna.length();
+        }
+        int stop2 = dna.indexOf("taa", index);
+        if (stop2 == -1 || (stop2-index) %3 != 0){
+            stop2 = dna.length();
+        }
+        int stop3 = dna.indexOf("tag", index);
+        if (stop3 == -1 || (stop3-index) %3 != 0){
+            stop3 = dna.length();
+        }
+        return Math.min(stop1, Math.min(stop2, stop3));
+    }
+    public void printAll() {
+        //FileResource fr = new FileResource();
+        //String s = fr.asString();
+        String s = "CATGTAATAGATGAATGACTGATAGATATGCTTGTATGCTATGAAAATGTGAAATGACCCA";
+        String dna = s.toLowerCase();
+        int start = 0;
+        
+        while (true){
+            int loc = dna.indexOf("atg", start);          
+            if (loc == -1)  {
+                break;
+            }            
+            int codon = findStopIndex(dna, loc+3);
+            if (codon != dna.length()) {
+                String test = dna.substring(loc,codon+3);
+                System.out.println(test);
+                start = codon +3;
+            }
+            else {
+                start = start +3;
+            }            
+        }
+    }
+    public StorageResource storeAll() {
+        FileResource fr = new FileResource();
+        String s = fr.asString();
+        String dna = s.toLowerCase();
+        StorageResource store = new StorageResource();
+        int start = 0;
+        
+        while (true){
+            int loc = dna.indexOf("atg", start);          
+            if (loc == -1)  {
+                break;
+            }            
+            int codon = findStopIndex(dna, loc+3);
+            if (codon != dna.length()) {
+                String test = dna.substring(loc,codon+3);
+                store.add(test);
+                start = codon +3;
+            }
+            else {
+                start = start +3;
+            }            
+        }
+        return store;
+    }
+    
+   
+    public float cgRatio(String dna){
+        //FileResource fr = new FileResource();
+        //String s = fr.asString();
+        String sLower = dna.toLowerCase(); 
+        StorageResource store = new StorageResource();
+        
+        int startC = 0;
+        int startG = 0;
+        while(true){
+            int c = sLower.indexOf("c", startC);            
+            if (c == -1) {
+                break;
+            }
+            else {             
+                String letterCG = "x";
+                store.add(letterCG);
+                startC = c + 1;
+            }
+        }
+        
+        while(true){
+            int g = sLower.indexOf("g", startG);
+            if (g == -1) {
+                break;
+            }
+            else {
+                String letterCG = "x";
+                store.add(letterCG);
+                startG = g + 1;
+            }
+        }
+        
+        float allCG = store.size();
+        //System.out.println(allCG);
+        int gene = (dna.length());
+        //System.out.println(gene);
+        float ratio = allCG/ gene;
+        
+        return ratio;
+    }
+    public StorageResource printOver60(StorageResource sr){
+        StorageResource store = new StorageResource();
+        
+        for (String gene : sr.data()){
+            
+            if (gene.length() > 60) {
+                store.add(gene);
+                //System.out.println("Strings longer than 60 -" + store.data());
+                //System.out.println("Number of strings over 60 -" + store.size());
+            }
+            
+            
+        
+        }
+        return store;
+    }
+    public StorageResource printOver35(StorageResource sr){
+        StorageResource store = new StorageResource();
+        
+        for (String gene : sr.data()){
+            if (cgRatio(gene) > 0.35) {
+                store.add(gene);
+                //System.out.println("Strings ratio over 0.35 -" + store.data());
+                //System.out.println("Number of strings over 0.35 -" + store.size());
+            }
+        
+        }
+       return store;
+    }
+    
+    public void getCTG(){
+        FileResource fr = new FileResource();
+        String s = fr.asString();
+        String dna = s.toLowerCase();
+        
+        StorageResource store = new StorageResource();               
+        
+        for (String gene : fr.lines()){
+            int start = 0;
+        
+            while(true){
+            int ctg = gene.indexOf("ctg", start);            
+            if (ctg == -1) {
+                break;
+            }
+            else {             
+                String fullCTG = gene.substring(ctg, ctg +3);
+                store.add(fullCTG);
+                
+                start = ctg +3;
+            }
+            
+            }
+        }        
+        System.out.print(store.size());
+    }
+    public int getLongest(StorageResource sr){
+        StorageResource store = new StorageResource();               
+        int large = 0;
+        
+        for (String gene : sr.data()){
+           int geno = gene.length();          
+           if (geno > large){
+                   large = geno;
+           }                             
+        }
+        return large;
+    }
+    
+            
+    public void testStorageFinder(){
+        StorageResource a = storeAll();
+         System.out.println("Number of genes found -" + a.size());
+        StorageResource b = printOver60(a);
+         //System.out.println(b.data());
+         System.out.println("Number over 60 -" + b.size());
+        StorageResource c = printOver35(a);
+         //System.out.println(c.data());
+         System.out.println("Number over 0.35 -" + c.size());
+        
+         
+         //StorageResource d = getCTG(a);         
+         //System.out.println("Number of CTGs -" + d.size());
+        int e = getLongest(a);
+         System.out.println("Longest string is -" + e);
+        
+         
+    }
+}
+
+

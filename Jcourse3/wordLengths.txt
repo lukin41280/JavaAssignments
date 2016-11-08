@@ -1,0 +1,46 @@
+import edu.duke.*;
+
+public class WordLengths {
+    public void countWordLengths(FileResource resource, int[] counts){
+        for (String word : resource.words()){
+            int wordLength = word.length();
+            char pos = word.charAt(wordLength - 1);
+            boolean ifLetter = Character.isLetter(pos);
+            if (wordLength >= counts.length){
+                wordLength = counts.length;
+            }
+            
+            if (ifLetter == false){
+                String newWord = word.substring(0,wordLength-1);
+                counts[newWord.length()] ++;
+            }
+            else{
+                counts[word.length()] ++;
+            }
+        }
+    }
+    
+    public int indexOfMax(int[] values){
+        int max = 0;
+        for (int k = 0; k < values.length; k++){
+            if (values[k] > values[max]) {
+                max = k;
+            }
+        }
+        return max;
+    }
+    
+    public void TESTCOUNTWORDLENGTH(){
+        FileResource fr = new FileResource();
+        int[] counts = new int[31];
+        countWordLengths(fr, counts);
+        for (int k = 0; k < counts.length; k++){
+                if (counts[k] > 0){
+                    System.out.println(counts[k] + " words of length " + k);
+            }
+        }
+        System.out.println("Highest word count = " + indexOfMax(counts));
+    }
+}
+
+

@@ -1,0 +1,46 @@
+import java.util.*;
+
+public class LargestQuakes {
+    
+    public void findLargestQuakes() {
+        EarthQuakeParser parser = new EarthQuakeParser();
+        //String source = "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.atom";
+        String source = "data/nov20quakedata.atom";
+        ArrayList<QuakeEntry> list  = parser.read(source);
+        System.out.println("read data for "+list.size()+" quakes");
+        double largestIndex = indexOfLargest(list);
+        String location = "";
+        ArrayList<QuakeEntry> largo = getLargest(list, 5);
+        
+        for (QuakeEntry qe : largo) {
+            System.out.println(qe);
+        }
+    }
+    
+    public double indexOfLargest(ArrayList<QuakeEntry> data){
+        double largestSoFar = 0;
+        for (QuakeEntry qe : data){
+            if (qe.getMagnitude() > largestSoFar){
+                largestSoFar = qe.getMagnitude();
+            }
+        }
+         return largestSoFar;
+    }
+    
+    public ArrayList<QuakeEntry> getLargest(ArrayList<QuakeEntry> quakeData, int howMany){
+        ArrayList<QuakeEntry> largeMag = new ArrayList<QuakeEntry>();
+        for(int j = 0; j < howMany; j++){
+            double largestIndex = indexOfLargest(quakeData);
+            int index = 0;
+            for (int k = 0; k < quakeData.size(); k++) {
+                QuakeEntry quake = quakeData.get(k);
+                if(quake.getMagnitude() == largestIndex){
+                    index = k;
+                }
+            }
+            largeMag.add(quakeData.get(index));
+            quakeData.remove(index);
+        }
+        return largeMag;
+    }
+}

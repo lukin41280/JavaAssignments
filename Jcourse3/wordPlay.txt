@@ -1,0 +1,56 @@
+import edu.duke.*;
+
+public class WordPlay {
+    public void TESTER (){
+        //TEST isVowel-----------------------------------------------
+        //System.out.println(isVowel('U'));
+        //TEST replaceVowels-----------------------------------------
+        //System.out.println(replaceVowels("Hello World", '*'));
+        //TEST emphasize--------------------------------------------
+        System.out.println(emphasize("Mary Bella Abracadabra", 'a'));
+    }
+    
+    public boolean isVowel (char ch){
+        if (ch=='a'||ch=='A'||ch=='e'||ch=='E'||ch=='i'||ch=='I'||ch=='o'||ch=='O'||ch=='u'||ch=='U'){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+    
+    public String replaceVowels (String phrase, char ch){
+        StringBuilder sb = new StringBuilder(phrase);
+        for (int k=0; k < sb.length(); k++){
+            char currChar = sb.charAt(k);
+            boolean x = isVowel(currChar);
+            if (x == true){
+                sb.setCharAt(k, ch);
+            } 
+        }
+        return sb.toString();
+    }
+    
+    public String emphasize (String phrase, char ch){
+        //String lowerPhrase = phrase.toLowerCase();
+        StringBuilder sb = new StringBuilder(phrase);
+        for (int k=0; k < sb.length(); k+=2){
+            char currChar = sb.charAt(k);
+            //System.out.println("k is:" + k);
+            if (Character.toLowerCase(currChar) == Character.toLowerCase(ch)){
+                sb.setCharAt(k, '*');
+            }
+            
+        }
+        for (int k=1; k < sb.length(); k+=2){
+            char currChar = sb.charAt(k);
+            //char lowerChar = currChar.toLowerCase();
+            //System.out.println("k is:" + k);
+            if (Character.toLowerCase(currChar) == Character.toLowerCase(ch)){
+                sb.setCharAt(k, '+');
+            }
+            
+        }
+        return sb.toString();
+    }
+}

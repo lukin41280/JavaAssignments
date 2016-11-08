@@ -1,0 +1,121 @@
+import edu.duke.*;
+
+public class CaesarBreaker {
+    public void testDECRYPT(){
+        FileResource fr = new FileResource();
+        String message = fr.asString();
+        //String message = "Akag tjw Xibhr awoa aoee xakex znxag xwko";
+        //System.out.println(decrypt(message));*/
+        //System.out.println(getKey(message));
+        System.out.println(decryptTwoKeys(message));
+        //String message = "mynameismud";
+        //System.out.println(message + "\n" + (halfOfString(message, 0)));
+        //System.out.println(halfOfString(message, 0));
+    }
+    
+    public int[] countletters(String message){
+        String alp="abcdefghijklmnopqrstuvwxyz";
+        int [] counts= new int [26];
+        for( int k=0; k< message.length(); k++){
+            char ch= Character.toLowerCase(message.charAt(k));
+            int dex=alp.indexOf(ch);
+            if (dex !=-1){
+                counts[dex] +=1;
+            }
+        }
+        return counts;
+    }
+    
+    public int maxIndex(int[] vals){
+        int maxDex=0;
+        for (int k=0;k <vals.length;k++){
+            if (vals[k]> vals[maxDex]){
+                maxDex=k;
+            }
+        }
+        return maxDex;
+    }
+    
+    public String decrypt(String encrypted){
+        CaesarCipher cc= new CaesarCipher();
+        int[] freqs=countletters(encrypted);
+        int maxDex= maxIndex(freqs);
+        int key= maxDex -4;
+        if (maxDex <4){
+            key=26-(4-maxDex);
+        }
+        return cc.encrypt(encrypted, 26-key);
+    }
+    
+    public String halfOfString(String message, int start){
+        String newMessage = "";
+        for (int k = start; k<message.length(); k += 2){
+            newMessage = newMessage + message.charAt(k);
+        }
+        return newMessage;
+    }
+    
+    public int getKey(String s){
+        
+        int[] freqs=countletters(s);
+        int maxDex= maxIndex(freqs);
+        int key= maxDex -4;
+        if (maxDex <4){
+            key=26-(4-maxDex);
+        }
+        return key;
+    }
+    
+    public String decryptTwoKeys(String encrypted){
+        CaesarCipher cc= new CaesarCipher();
+        
+        String partString1 = halfOfString(encrypted,0);
+        String partString2 = halfOfString(encrypted,1);
+        int key1 = getKey(partString1);
+        int key2 = getKey(partString2);
+        System.out.println("Key 1 = " + (key1) + "\n" + "Key 2 = " + (key2));
+        
+        return encryptTwoKeys(encrypted, 26 - key1, 26 - key2);
+    }
+
+    public String encryptTwoKeys(String input, int key1, int key2){
+        StringBuilder encrypted = new StringBuilder(input);
+        String alphabet1 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lowerAlph1 = "abcdefghijklmnopqrstuvwxyz";
+        String fullAlph1 = alphabet1 + lowerAlph1;
+        String shiftedAlphabet1 = alphabet1.substring(key1)+
+        alphabet1.substring(0,key1);
+        String shiftLowerAlph1 = lowerAlph1.substring(key1)+
+        lowerAlph1.substring(0,key1);
+        String shiftFullAlph1 = shiftedAlphabet1 + shiftLowerAlph1;
+        
+        String alphabet2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lowerAlph2 = "abcdefghijklmnopqrstuvwxyz";
+        String fullAlph2 = alphabet2 + lowerAlph2;
+        String shiftedAlphabet2 = alphabet2.substring(key2)+
+        alphabet2.substring(0,key2);
+        String shiftLowerAlph2 = lowerAlph2.substring(key2)+
+        lowerAlph2.substring(0,key2);
+        String shiftFullAlph2 = shiftedAlphabet2 + shiftLowerAlph2;
+        
+        for(int i = 0; i < encrypted.length(); i+=2) {
+            char currChar = encrypted.charAt(i);
+            int idx = fullAlph1.indexOf(currChar);
+            if(idx != -1){
+                char newChar = shiftFullAlph1.charAt(idx);
+                encrypted.setCharAt(i, newChar);
+            }
+        }
+        
+        for(int i = 1; i < encrypted.length(); i+=2) {
+            char currChar = encrypted.charAt(i);
+            int idx = fullAlph2.indexOf(currChar);
+            if(idx != -1){
+                char newChar = shiftFullAlph2.charAt(idx);
+                encrypted.setCharAt(i, newChar);
+            }
+        }
+        return encrypted.toString();
+    }
+}
+

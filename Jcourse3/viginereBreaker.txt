@@ -1,0 +1,143 @@
+import java.util.*;
+import edu.duke.*;
+import java.io.*;
+
+public class VigenereBreaker {
+    public String sliceString(String message, int whichSlice, int totalSlices) {
+        StringBuilder sb = new StringBuilder(message);
+        StringBuilder sliced = new StringBuilder();
+        for (int k = whichSlice; k < message.length(); k += totalSlices){
+            sliced.append(sb.charAt(k));    
+        }
+        return sliced.toString();
+    }
+
+    public int[] tryKeyLength(String encrypted, int klength, char mostCommon) {
+        int[] key = new int[klength];
+        CaesarCracker cc = new CaesarCracker(mostCommon);
+        for(int k = 0; k < klength; k ++){
+            String vig = sliceString(encrypted, k, klength);
+            int sliceKey = cc.getKey(vig); 
+            System.out.println("Key used: "+k+"\n"+sliceKey);
+            key[k] = sliceKey;
+        }
+        
+        return key;
+    }
+
+    public HashSet<String> readDictionary(FileResource fr){
+        HashSet<String> dictionary = new HashSet<String>();
+        for (String s : fr.words()){
+            String str = s.toLowerCase();
+            dictionary.add(str);
+        }
+        return dictionary;
+    }
+    
+    public int countWords(String message, HashSet<String> dictionary){
+        int count = 0;
+        int totcount = 0;
+        for (String s : message.split("\\W")){
+            String sLow = s.toLowerCase();
+            if (dictionary.contains(sLow)){
+                count = count +1;
+                totcount = totcount+1;
+            }
+            else{
+                totcount = totcount+1;    
+            }
+        }
+        return count;
+    }
+    
+    public String breakForLanguage(String encrypted, HashSet<String> dictionary){
+        String decrypted = "";
+        int count = 0;
+        int keyUsed = 1; 
+        int [] keyTotals = new int [keyUsed];
+        char common = mostCommonCharIn(dictionary);
+        for (int k = 1; k<100; k++){
+          int[] key = tryKeyLength(encrypted, k, common);
+          VigenereCipher vc = new VigenereCipher(key);
+          String dec = vc.decrypt(encrypted);
+          int realWords = countWords(dec, dictionary);
+          
+          if (realWords > count){
+              decrypted = dec;  
+              count = realWords;
+              keyUsed = k;
+              
+          }
+          
+        }
+        System.out.println("Valid words: "+count + "\n"+ "Key used: " + keyUsed);
+        return decrypted;
+    }
+    
+    public char mostCommonCharIn(HashSet<String> dictionary){
+        char mostCommon = ' ';
+        int count = 0;
+        HashMap<Character,Integer> counter = new HashMap<Character,Integer>();
+        for (String s : dictionary){
+        for (int k = 0; k<s.length(); k++){
+            char ch = s.charAt(k); 
+            if (Character.isLetter(ch)){
+            
+                if (!counter.containsKey(ch)){
+                    counter.put(ch,1);
+                }
+                else{
+                    int get = counter.get(ch); 
+                    counter.put(ch,get+1);
+                }
+            }
+            }
+        }
+        for (Character i : counter.keySet()){
+            if (counter.get(i) > count){
+                count = counter.get(i);
+                mostCommon = i;  
+            }
+        }
+        System.out.println(counter);
+        System.out.println("Most common letter " + " - "+mostCommon+" - " +" Counts for letter: "+count);
+        return mostCommon;
+    }
+    
+    public String breakForAllLanguages(String encrypted, HashMap<String,HashSet<String>> languages){
+        String decrypted = "";
+        String language = "";
+        int count = 0;
+        for (String s : languages.keySet()){
+            
+            String dec = breakForLanguage(encrypted, languages.get(s)); 
+            int countWords = countWords(dec, languages.get(s)); 
+            System.out.println ("Language: "+s+", Valid words: "+countWords+", Max count :"+count);
+            if (countWords > count){ 
+            count = countWords;
+            decrypted = dec;
+            language = s;
+            }
+        }
+        System.out.println("Language used: "+language);
+        return decrypted;
+        
+    }
+    
+    public void breakVigenere () {
+        DirectoryResource dr = new DirectoryResource();
+        HashMap<String, HashSet<String>> hm = new HashMap<String, HashSet<String>>(); 
+        int countFile = 1;
+        for (File f : dr.selectedFiles()){
+            FileResource fr = new FileResource(f);
+            HashSet<String> dict = readDictionary(fr);
+            hm.put(f.getName(), dict);
+            System.out.println("Done with file "+countFile);
+            countFile = countFile +1;
+        }
+        FileResource encrypted = new FileResource();
+        String encryptString = encrypted.asString();
+        System.out.println(breakForAllLanguages(encryptString,hm));
+
+    }
+}
